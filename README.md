@@ -22,3 +22,29 @@ A collaborative classroom management tool built for the GitHub Lab.
 1. **Commits:** Every member must commit using their own GitHub account (Instructor requirement).
 2. **Branches:** Use feature branches (e.g., `feature/lock-screen`) and Merge Requests.
 3. **Demo:** Ensure an `.exe` or an installer script is ready for the final submission.
+
+## Project Structure
+
+```
+
+NetSupport-MVP/
+
+├── NetSupport.Tutor/       # WPF/WinForms App
+
+├── NetSupport.Student/     # Windows Service + Hidden UI
+
+├── NetSupport.Designer/    # Desktop App for MCQ creation
+
+├── NetSupport.Shared/      # Class Library (Models, Networking Logic, DTOs)
+
+├── docs/
+
+│   └── Protocols/          # Documentation on how Tutor/Student talk
+
+├── exams/                  # Sample CSV/JSON exam files
+
+├── README.md
+
+└── .gitignore
+
+```

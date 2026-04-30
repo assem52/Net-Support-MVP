@@ -1,0 +1,18 @@
+<Window x:Class="NetSupport.Student.UI.LockScreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Screen Locked" 
+        WindowStyle="None" 
+        WindowState="Maximized" 
+        Topmost="True" 
+        Background="#D9202020" 
+        ShowInTaskbar="False">
+    <Grid>
+        <TextBlock Text="Screen Locked by Instructor" 
+                   Foreground="White" 
+                   FontSize="48" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"/>
+    </Grid>
+</Window>

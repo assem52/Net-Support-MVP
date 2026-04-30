@@ -132,8 +132,15 @@ public partial class MainWindow : Window
     {
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
+            if (!student.IsReady)
+            {
+                MessageBox.Show("This student has not joined an exam yet.\n\nPlease click 'Open Testing Console' to push an exam to this student first, then wait for them to log in.", "Exam Not Ready", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             await _commandSender.SendCommandAsync(student.Ip, "START_EXAM");
             student.Score = "Started...";
+            MessageBox.Show($"Exam started for {student.Name}!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
@@ -145,7 +152,17 @@ public partial class MainWindow : Window
     {
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
-            await _commandSender.SendCommandAsync(student.Ip, "STOP_EXAM");
+            if (!student.IsReady && string.IsNullOrEmpty(student.Score))
+            {
+                MessageBox.Show("This student is not currently taking an exam.", "No Active Exam", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (MessageBox.Show($"Are you sure you want to stop the exam for {student.Name}? This will force them to submit.", "Confirm Stop", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                await _commandSender.SendCommandAsync(student.Ip, "STOP_EXAM");
+                MessageBox.Show("Stop command sent.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         else
         {

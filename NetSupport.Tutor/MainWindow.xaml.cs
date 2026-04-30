@@ -11,31 +11,27 @@ namespace NetSupport.Tutor;
 public partial class MainWindow : Window
 {
     private UdpListener _listener;
-    
-    // ObservableCollection automatically updates the UI when items are added
     private ObservableCollection<StudentHelloPayload> _discoveredStudents;
+    private TcpCommandSender _commandSender;
 
     public MainWindow()
     {
         InitializeComponent();
         
         _discoveredStudents = new ObservableCollection<StudentHelloPayload>();
-        
-        // Bind the DataGrid to our collection
         StudentsDataGrid.ItemsSource = _discoveredStudents;
 
-        // Initialize and start listening for students
         _listener = new UdpListener();
         _listener.StudentDiscovered += OnStudentDiscovered;
         _listener.StartListening();
+
+        _commandSender = new TcpCommandSender();
     }
 
     private void OnStudentDiscovered(object? sender, StudentHelloPayload student)
     {
-        // UI updates must happen on the main UI thread
         Application.Current.Dispatcher.Invoke(() =>
         {
-            // Check if we already have this student in the list to avoid duplicates
             var existing = _discoveredStudents.FirstOrDefault(s => s.Ip == student.Ip);
             if (existing == null)
             {
@@ -44,9 +40,32 @@ public partial class MainWindow : Window
         });
     }
 
+    private async void LockBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
+        {
+            await _commandSender.SendCommandAsync(student.Ip, "LOCK");
+        }
+        else
+        {
+            MessageBox.Show("Please select a student from the list first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async void UnlockBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
+        {
+            await _commandSender.SendCommandAsync(student.Ip, "UNLOCK");
+        }
+        else
+        {
+            MessageBox.Show("Please select a student from the list first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
-        // Always clean up network resources when closing
         _listener.Stop();
         base.OnClosed(e);
     }

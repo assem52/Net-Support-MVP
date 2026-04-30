@@ -145,10 +145,27 @@ public partial class ExamWindow : Window
         _timer.Stop();
 
         int score = CalculateScore();
+        
+        var detailed = new List<StudentAnswerInfo>();
+        for (int i = 0; i < _exam.Questions.Count; i++)
+        {
+            var q = _exam.Questions[i];
+            string selected = _answers.ContainsKey(i) ? _answers[i] : "None";
+            detailed.Add(new StudentAnswerInfo
+            {
+                QuestionIndex = i + 1,
+                QuestionText = q.QuestionText,
+                SelectedOption = selected,
+                CorrectOption = q.CorrectOption,
+                IsCorrect = selected == q.CorrectOption
+            });
+        }
+
         var payload = new ExamResultPayload
         {
             Ip = GetLocalIpAddress(),
-            FinalScore = $"{score}/{_exam.Questions.Count}"
+            FinalScore = $"{score}/{_exam.Questions.Count}",
+            DetailedAnswers = detailed
         };
 
         await _updateSender.SendUpdateAsync("EXAM_RESULT", payload);

@@ -21,6 +21,7 @@
             <Button x:Name="TestingConsoleBtn" Content="Open Testing Console" Width="150" Margin="0,0,10,0" Click="TestingConsoleBtn_Click"/>
             <Button x:Name="StartExamBtn" Content="Start Exam" Width="100" Margin="0,0,10,0" Click="StartExamBtn_Click" Background="LightGreen"/>
             <Button x:Name="StopExamBtn" Content="Stop Exam" Width="100" Margin="0,0,10,0" Click="StopExamBtn_Click" Background="LightCoral"/>
+            <Button x:Name="GenerateReportBtn" Content="Generate Report" Width="120" Margin="0,0,10,0" Click="GenerateReportBtn_Click" Background="LightBlue"/>
         </StackPanel>
         
         <DataGrid x:Name="StudentsDataGrid" Grid.Row="2" AutoGenerateColumns="True" IsReadOnly="True" SelectionMode="Single" />

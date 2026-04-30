@@ -19,4 +19,10 @@ public class ExamResultPayload
     /// </summary>
     [JsonPropertyName("final_score")]
     public string FinalScore { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The complete breakdown of every question and the student's answer.
+    /// </summary>
+    [JsonPropertyName("detailed_answers")]
+    public System.Collections.Generic.List<StudentAnswerInfo> DetailedAnswers { get; set; } = new();
 }

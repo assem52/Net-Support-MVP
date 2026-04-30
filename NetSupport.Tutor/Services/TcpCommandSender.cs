@@ -11,7 +11,7 @@ namespace NetSupport.Tutor.Services;
 /// </summary>
 public class TcpCommandSender
 {
-    public async Task SendCommandAsync(string ipAddress, string commandType)
+    public async Task SendCommandAsync(string ipAddress, string commandType, object? customPayload = null)
     {
         try
         {
@@ -23,8 +23,8 @@ public class TcpCommandSender
             var message = new NetworkMessage
             {
                 Type = commandType,
-                // Lock/Unlock don't need a complex payload, so we just send an empty object
-                Payload = JsonSerializer.SerializeToElement(new { })
+                // Serialize custom payload, or default to an empty object for Lock/Unlock
+                Payload = JsonSerializer.SerializeToElement(customPayload ?? new { })
             };
 
             var json = JsonSerializer.Serialize(message);

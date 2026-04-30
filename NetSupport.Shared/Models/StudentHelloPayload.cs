@@ -13,6 +13,7 @@ public class StudentHelloPayload : INotifyPropertyChanged
     private string _ip = string.Empty;
     private string _room = string.Empty;
     private bool _isLocked = false;
+    private bool _isReady = false;
 
     /// <summary>
     /// The name of the student's PC (e.g., "PC-01").
@@ -38,6 +39,12 @@ public class StudentHelloPayload : INotifyPropertyChanged
     /// </summary>
     [JsonIgnore]
     public bool IsLocked { get => _isLocked; set { _isLocked = value; OnPropertyChanged(); } }
+
+    /// <summary>
+    /// UI Helper flag to show if the student has logged into the exam and is ready.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsReady { get => _isReady; set { _isReady = value; OnPropertyChanged(); } }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

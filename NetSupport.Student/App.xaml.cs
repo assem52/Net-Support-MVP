@@ -22,32 +22,36 @@ public partial class App : Application
 
         // 2. Start TCP Command Listener (waits for LOCK commands)
         _commandListener = new TcpCommandListener();
-        _commandListener.LockCommandReceived += OnLockCommandReceived;
-        _commandListener.UnlockCommandReceived += OnUnlockCommandReceived;
+        _commandListener.CommandReceived += OnCommandReceived;
         _commandListener.StartListening();
     }
 
-    private void OnLockCommandReceived(object? sender, EventArgs e)
-    {
-        // UI code must run on the UI dispatcher
-        Current.Dispatcher.Invoke(() =>
-        {
-            if (_lockWindow == null)
-            {
-                _lockWindow = new LockScreenWindow();
-                _lockWindow.Show();
-            }
-        });
-    }
-
-    private void OnUnlockCommandReceived(object? sender, EventArgs e)
+    private void OnCommandReceived(object? sender, CommandReceivedEventArgs e)
     {
         Current.Dispatcher.Invoke(() =>
         {
-            if (_lockWindow != null)
+            switch (e.Message.Type)
             {
-                _lockWindow.Close();
-                _lockWindow = null;
+                case "LOCK":
+                    if (_lockWindow == null)
+                    {
+                        _lockWindow = new LockScreenWindow();
+                        _lockWindow.Show();
+                    }
+                    break;
+                case "UNLOCK":
+                    if (_lockWindow != null)
+                    {
+                        _lockWindow.Close();
+                        _lockWindow = null;
+                    }
+                    break;
+                case "PUSH_EXAM":
+                    // Provide the Tutor IP back to the login window so it knows who to talk to
+                    var senderSvc = new TcpUpdateSender(e.TutorIp);
+                    var loginWin = new ExamLoginWindow(senderSvc);
+                    loginWin.Show();
+                    break;
             }
         });
     }

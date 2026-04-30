@@ -8,9 +8,23 @@ namespace NetSupport.Student.UI;
 /// </summary>
 public partial class LockScreenWindow : Window
 {
+    // SAFETY FLAG: Set this to false before deploying to actual student PCs!
+    // When true, the lock screen will NOT maximize so you can test locally without locking yourself out.
+    public static bool IsLocalDebugMode = true;
+
     public LockScreenWindow()
     {
         InitializeComponent();
+        
+        if (IsLocalDebugMode)
+        {
+            this.WindowState = WindowState.Normal;
+            this.Topmost = false;
+            this.Width = 800;
+            this.Height = 600;
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            this.Title = "Screen Locked (LOCAL DEBUG MODE)";
+        }
     }
 
     // Prevent Alt-F4 from closing the lock screen

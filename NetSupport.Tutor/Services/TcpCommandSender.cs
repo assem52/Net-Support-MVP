@@ -11,13 +11,15 @@ namespace NetSupport.Tutor.Services;
 /// </summary>
 public class TcpCommandSender
 {
-    public async Task SendCommandAsync(string ipAddress, string commandType, object? customPayload = null)
+    public async Task SendCommandAsync(string ipAddress, string commandType, object? customPayload = null, int port = 0)
     {
+        // Fall back to the constant if no dynamic port was provided (legacy real-machine mode)
+        int targetPort = port > 0 ? port : Constants.TcpCommandPort;
         try
         {
             // Connect directly to the specific student
             using var tcpClient = new TcpClient();
-            await tcpClient.ConnectAsync(ipAddress, Constants.TcpCommandPort);
+            await tcpClient.ConnectAsync(ipAddress, targetPort);
 
             // Prepare the JSON message
             var message = new NetworkMessage

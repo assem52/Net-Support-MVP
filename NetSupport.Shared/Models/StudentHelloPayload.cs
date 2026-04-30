@@ -16,6 +16,20 @@ public class StudentHelloPayload : INotifyPropertyChanged
     private bool _isReady = false;
 
     /// <summary>
+    /// A unique identifier for this specific student instance. Allows the Tutor to
+    /// distinguish between multiple Student apps running on the same machine (same IP).
+    /// </summary>
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// The dynamic TCP port this student instance is listening on.
+    /// This allows multiple instances to run simultaneously without port conflicts.
+    /// </summary>
+    [JsonPropertyName("tcpPort")]
+    public int TcpPort { get; set; } = 0;
+
+    /// <summary>
     /// The name of the student's PC (e.g., "PC-01").
     /// </summary>
     [JsonPropertyName("name")]

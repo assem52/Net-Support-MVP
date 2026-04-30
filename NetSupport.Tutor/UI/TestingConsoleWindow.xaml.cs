@@ -72,7 +72,7 @@ public partial class TestingConsoleWindow : Window
         };
 
         // Send the payload to the specific student
-        await _commandSender.SendCommandAsync(_targetStudent.Ip, "PUSH_EXAM", payload);
+        await _commandSender.SendCommandAsync(_targetStudent.Ip, "PUSH_EXAM", payload, _targetStudent.TcpPort);
 
         MessageBox.Show("Exam pushed successfully! Waiting for student to login...", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         this.Close();

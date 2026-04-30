@@ -15,19 +15,31 @@ public class CommandReceivedEventArgs : EventArgs
 
 /// <summary>
 /// Listens for direct TCP commands (like LOCK/UNLOCK/PUSH_EXAM) from the Tutor.
+/// Binds to port 0 so the OS assigns a free random port, enabling multiple
+/// Student instances to run simultaneously on the same machine.
 /// </summary>
 public class TcpCommandListener
 {
     private bool _isRunning = false;
     private TcpListener? _tcpListener;
 
+    /// <summary>
+    /// The actual port the OS assigned after binding to port 0.
+    /// This must be broadcast to the Tutor so it knows where to connect.
+    /// </summary>
+    public int AssignedPort { get; private set; } = 0;
+
     public event EventHandler<CommandReceivedEventArgs>? CommandReceived;
 
     public void StartListening()
     {
         _isRunning = true;
-        _tcpListener = new TcpListener(IPAddress.Any, Constants.TcpCommandPort);
+        // Bind to port 0: the OS will automatically assign a free port
+        _tcpListener = new TcpListener(IPAddress.Any, 0);
         _tcpListener.Start();
+
+        // Read back which port was actually assigned
+        AssignedPort = ((IPEndPoint)_tcpListener.LocalEndpoint).Port;
 
         Task.Run(ListenLoopAsync);
     }

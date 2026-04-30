@@ -16,6 +16,8 @@ public class TcpUpdateListener
     private TcpListener? _tcpListener;
 
     public event EventHandler<StudentReadyPayload>? StudentReadyReceived;
+    public event EventHandler<AnswerUpdatePayload>? AnswerUpdateReceived;
+    public event EventHandler<ExamResultPayload>? ExamResultReceived;
 
     public void StartListening()
     {
@@ -33,6 +35,8 @@ public class TcpUpdateListener
             try
             {
                 using var client = await _tcpListener!.AcceptTcpClientAsync();
+                var remoteIp = ((IPEndPoint)client.Client.RemoteEndPoint!).Address.ToString();
+                
                 using var stream = client.GetStream();
                 using var reader = new StreamReader(stream);
                 
@@ -41,12 +45,34 @@ public class TcpUpdateListener
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     var message = JsonSerializer.Deserialize<NetworkMessage>(json);
-                    if (message != null && message.Type == "STUDENT_READY")
+                    if (message != null)
                     {
-                        var payload = JsonSerializer.Deserialize<StudentReadyPayload>(message.Payload.GetRawText());
-                        if (payload != null)
+                        if (message.Type == "STUDENT_READY")
                         {
-                            StudentReadyReceived?.Invoke(this, payload);
+                            var payload = JsonSerializer.Deserialize<StudentReadyPayload>(message.Payload.GetRawText());
+                            if (payload != null)
+                            {
+                                if (string.IsNullOrEmpty(payload.Ip)) payload.Ip = remoteIp;
+                                StudentReadyReceived?.Invoke(this, payload);
+                            }
+                        }
+                        else if (message.Type == "ANSWER_UPDATE")
+                        {
+                            var payload = JsonSerializer.Deserialize<AnswerUpdatePayload>(message.Payload.GetRawText());
+                            if (payload != null)
+                            {
+                                if (string.IsNullOrEmpty(payload.Ip)) payload.Ip = remoteIp;
+                                AnswerUpdateReceived?.Invoke(this, payload);
+                            }
+                        }
+                        else if (message.Type == "EXAM_RESULT")
+                        {
+                            var payload = JsonSerializer.Deserialize<ExamResultPayload>(message.Payload.GetRawText());
+                            if (payload != null)
+                            {
+                                if (string.IsNullOrEmpty(payload.Ip)) payload.Ip = remoteIp;
+                                ExamResultReceived?.Invoke(this, payload);
+                            }
                         }
                     }
                 }

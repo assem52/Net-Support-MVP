@@ -1,0 +1,46 @@
+<Window x:Class="NetSupport.Student.UI.ExamWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Exam in Progress" 
+        WindowStyle="None" 
+        WindowState="Maximized" 
+        Topmost="True" 
+        Background="White" 
+        ShowInTaskbar="False">
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <TextBlock x:Name="TxtProgress" Text="Question 1 of 10" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Time Remaining: " FontSize="24" FontWeight="Bold"/>
+                <TextBlock x:Name="TxtTimer" Text="30:00" FontSize="24" FontWeight="Bold" Foreground="Red"/>
+            </StackPanel>
+        </Grid>
+
+        <Separator Grid.Row="1" Margin="0,20,0,20"/>
+
+        <!-- Question Body -->
+        <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="800">
+            <TextBlock x:Name="TxtQuestion" Text="Sample Question Text?" FontSize="32" TextWrapping="Wrap" Margin="0,0,0,30" HorizontalAlignment="Center"/>
+            
+            <RadioButton x:Name="RbOptionA" Content="Option A" FontSize="24" Margin="0,0,0,15" Checked="Option_Checked"/>
+            <RadioButton x:Name="RbOptionB" Content="Option B" FontSize="24" Margin="0,0,0,15" Checked="Option_Checked"/>
+            <RadioButton x:Name="RbOptionC" Content="Option C" FontSize="24" Margin="0,0,0,15" Checked="Option_Checked"/>
+            <RadioButton x:Name="RbOptionD" Content="Option D" FontSize="24" Margin="0,0,0,15" Checked="Option_Checked"/>
+        </StackPanel>
+
+        <!-- Footer -->
+        <Grid Grid.Row="3">
+            <Button x:Name="BtnPrev" Content="Previous" Width="150" Height="50" FontSize="20" HorizontalAlignment="Left" Click="BtnPrev_Click"/>
+            <Button x:Name="BtnNext" Content="Next" Width="150" Height="50" FontSize="20" HorizontalAlignment="Right" Click="BtnNext_Click"/>
+            <Button x:Name="BtnSubmit" Content="Submit Exam" Width="200" Height="50" FontSize="20" HorizontalAlignment="Right" Background="LightGreen" Visibility="Collapsed" Click="BtnSubmit_Click"/>
+        </Grid>
+    </Grid>
+</Window>

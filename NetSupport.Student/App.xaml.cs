@@ -11,6 +11,9 @@ public partial class App : Application
     private UdpBroadcaster? _broadcaster;
     private TcpCommandListener? _commandListener;
     private LockScreenWindow? _lockWindow;
+    private ExamLoginWindow? _loginWindow;
+    private UI.ExamWindow? _examWindow;
+    private Shared.Models.PushExamPayload? _currentExam;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -47,10 +50,27 @@ public partial class App : Application
                     }
                     break;
                 case "PUSH_EXAM":
-                    // Provide the Tutor IP back to the login window so it knows who to talk to
+                    _currentExam = System.Text.Json.JsonSerializer.Deserialize<Shared.Models.PushExamPayload>(e.Message.Payload.GetRawText());
                     var senderSvc = new TcpUpdateSender(e.TutorIp);
-                    var loginWin = new ExamLoginWindow(senderSvc);
-                    loginWin.Show();
+                    _loginWindow = new ExamLoginWindow(senderSvc);
+                    _loginWindow.Show();
+                    break;
+                case "START_EXAM":
+                    if (_currentExam != null)
+                    {
+                        _loginWindow?.Close();
+                        _loginWindow = null;
+                        
+                        var examSender = new TcpUpdateSender(e.TutorIp);
+                        _examWindow = new UI.ExamWindow(_currentExam, examSender);
+                        _examWindow.Show();
+                    }
+                    break;
+                case "STOP_EXAM":
+                    if (_examWindow != null)
+                    {
+                        _examWindow.ForceSubmit();
+                    }
                     break;
             }
         });

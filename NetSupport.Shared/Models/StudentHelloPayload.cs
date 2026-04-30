@@ -46,6 +46,13 @@ public class StudentHelloPayload : INotifyPropertyChanged
     [JsonIgnore]
     public bool IsReady { get => _isReady; set { _isReady = value; OnPropertyChanged(); } }
 
+    private string _score = string.Empty;
+    /// <summary>
+    /// UI Helper to show live score updates (e.g., "3/5").
+    /// </summary>
+    [JsonIgnore]
+    public string Score { get => _score; set { _score = value; OnPropertyChanged(); } }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

@@ -28,6 +28,8 @@ public partial class MainWindow : Window
 
         _updateListener = new TcpUpdateListener();
         _updateListener.StudentReadyReceived += OnStudentReadyReceived;
+        _updateListener.AnswerUpdateReceived += OnAnswerUpdateReceived;
+        _updateListener.ExamResultReceived += OnExamResultReceived;
         _updateListener.StartListening();
 
         _commandSender = new TcpCommandSender();
@@ -57,6 +59,31 @@ public partial class MainWindow : Window
                 {
                     existing.Name = payload.StudentName; // Update with real name
                 }
+            }
+        });
+    }
+
+    private void OnAnswerUpdateReceived(object? sender, AnswerUpdatePayload payload)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var existing = _discoveredStudents.FirstOrDefault(s => s.Ip == payload.Ip);
+            if (existing != null)
+            {
+                existing.Score = payload.ScoreString;
+            }
+        });
+    }
+
+    private void OnExamResultReceived(object? sender, ExamResultPayload payload)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var existing = _discoveredStudents.FirstOrDefault(s => s.Ip == payload.Ip);
+            if (existing != null)
+            {
+                existing.Score = $"FINAL: {payload.FinalScore}";
+                existing.IsReady = false; // Exam is over
             }
         });
     }
@@ -94,6 +121,31 @@ public partial class MainWindow : Window
             var console = new UI.TestingConsoleWindow(student, _commandSender);
             console.Owner = this;
             console.Show();
+        }
+        else
+        {
+            MessageBox.Show("Please select a student from the list first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async void StartExamBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
+        {
+            await _commandSender.SendCommandAsync(student.Ip, "START_EXAM");
+            student.Score = "Started...";
+        }
+        else
+        {
+            MessageBox.Show("Please select a student from the list first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async void StopExamBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
+        {
+            await _commandSender.SendCommandAsync(student.Ip, "STOP_EXAM");
         }
         else
         {

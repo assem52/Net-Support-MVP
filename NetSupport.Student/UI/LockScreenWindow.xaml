@@ -8,11 +8,22 @@
         Background="#D9202020" 
         ShowInTaskbar="False">
     <Grid>
-        <TextBlock Text="Screen Locked by Instructor" 
-                   Foreground="White" 
-                   FontSize="48" 
-                   FontWeight="Bold" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"/>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Screen Locked by Instructor" 
+                       Foreground="White" 
+                       FontSize="48" 
+                       FontWeight="Bold" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,30"/>
+                       
+            <Button Content="Emergency Unlock" 
+                    Width="150" Height="40" 
+                    Background="#440000" 
+                    Foreground="White" 
+                    BorderThickness="1" 
+                    BorderBrush="#FF5555"
+                    Cursor="Hand"
+                    Click="EmergencyUnlock_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

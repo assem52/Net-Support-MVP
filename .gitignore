@@ -40,6 +40,10 @@ bld/
 !.vscode/extensions.json
 *.code-workspace
 
+# docs md's
+docs/
+
+
 # OS generated files
 .DS_Store
 .DS_Store?

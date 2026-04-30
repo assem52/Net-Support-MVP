@@ -1,6 +1,7 @@
-using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using NetSupport.Shared.Models;
+using NetSupport.Shared.Services;
 using NetSupport.Tutor.Services;
 
 namespace NetSupport.Tutor;
@@ -183,8 +184,9 @@ public partial class MainWindow : Window
 
         try
         {
+            bool isArabic = LanguageToggle.SelectedItem != null && ((ComboBoxItem)LanguageToggle.SelectedItem).Tag.ToString() == "ar";
             var generator = new PdfReportGenerator();
-            string filePath = generator.GenerateReport(finishedStudents); // Only pass finished students
+            string filePath = generator.GenerateReport(finishedStudents, isArabic); // Only pass finished students
 
             var result = MessageBox.Show($"Report successfully generated!\n\nSaved to:\n{filePath}\n\nDo you want to open the folder containing the report?", "Success", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (result == MessageBoxResult.Yes)
@@ -195,6 +197,35 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show($"Failed to generate report: {ex.Message}\nMake sure you added the QuestPDF NuGet package!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void LanguageToggle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        
+        bool isArabic = ((ComboBoxItem)LanguageToggle.SelectedItem).Tag.ToString() == "ar";
+        
+        // Flip RTL
+        this.FlowDirection = isArabic ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+        
+        // Translate UI
+        LblTitle.Text = TranslationService.Translate("Discovered Students:", isArabic);
+        LblLanguage.Content = TranslationService.Translate("Language:", isArabic);
+        LockBtn.Content = TranslationService.Translate("Lock Selected", isArabic);
+        UnlockBtn.Content = TranslationService.Translate("Unlock Selected", isArabic);
+        TestingConsoleBtn.Content = TranslationService.Translate("Open Testing Console", isArabic);
+        StartExamBtn.Content = TranslationService.Translate("Start Exam", isArabic);
+        StopExamBtn.Content = TranslationService.Translate("Stop Exam", isArabic);
+        GenerateReportBtn.Content = TranslationService.Translate("Generate Report", isArabic);
+
+        // Translate DataGrid Headers
+        if (StudentsDataGrid.Columns.Count >= 5)
+        {
+            StudentsDataGrid.Columns[1].Header = TranslationService.Translate("Student Name", isArabic); // Assuming column indexes
+            StudentsDataGrid.Columns[2].Header = TranslationService.Translate("IP Address", isArabic);
+            StudentsDataGrid.Columns[3].Header = TranslationService.Translate("Status", isArabic);
+            StudentsDataGrid.Columns[4].Header = TranslationService.Translate("Score", isArabic);
         }
     }
 

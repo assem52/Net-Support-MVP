@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 using NetSupport.Shared.Models;
+using NetSupport.Shared.Services;
 using NetSupport.Tutor.Services;
 
 namespace NetSupport.Tutor.UI;
@@ -17,7 +18,15 @@ public partial class TestingConsoleWindow : Window
         InitializeComponent();
         _targetStudent = targetStudent;
         _commandSender = commandSender;
-        Title = $"Testing Console - Sending to {_targetStudent.Name}";
+
+        bool isArabic = TranslationService.IsArabic;
+        this.FlowDirection = isArabic ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+        
+        Title = isArabic ? $"وحدة التحكم - إرسال إلى {_targetStudent.Name}" : $"Testing Console - Sending to {_targetStudent.Name}";
+        
+        BtnBrowse.Content = TranslationService.Translate("Browse CSV", isArabic);
+        BtnPush.Content = TranslationService.Translate("Push Exam to Selected", isArabic);
+        TxtFileName.Text = TranslationService.Translate("No file selected", isArabic);
     }
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)

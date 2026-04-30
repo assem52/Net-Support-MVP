@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <TextBlock Text="Discovered Students:" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+        <TextBlock x:Name="LblTitle" Text="Discovered Students:" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
             <Button x:Name="LockBtn" Content="Lock Selected" Width="100" Margin="0,0,10,0" Click="LockBtn_Click"/>
@@ -22,6 +22,12 @@
             <Button x:Name="StartExamBtn" Content="Start Exam" Width="100" Margin="0,0,10,0" Click="StartExamBtn_Click" Background="LightGreen"/>
             <Button x:Name="StopExamBtn" Content="Stop Exam" Width="100" Margin="0,0,10,0" Click="StopExamBtn_Click" Background="LightCoral"/>
             <Button x:Name="GenerateReportBtn" Content="Generate Report" Width="120" Margin="0,0,10,0" Click="GenerateReportBtn_Click" Background="LightBlue"/>
+            
+            <Label x:Name="LblLanguage" Content="Language:" VerticalAlignment="Center"/>
+            <ComboBox x:Name="LanguageToggle" Width="80" Margin="0,0,10,0" SelectionChanged="LanguageToggle_SelectionChanged" VerticalContentAlignment="Center">
+                <ComboBoxItem Content="English" IsSelected="True" Tag="en"/>
+                <ComboBoxItem Content="العربية" Tag="ar"/>
+            </ComboBox>
         </StackPanel>
         
         <DataGrid x:Name="StudentsDataGrid" Grid.Row="2" AutoGenerateColumns="True" IsReadOnly="True" SelectionMode="Single" />

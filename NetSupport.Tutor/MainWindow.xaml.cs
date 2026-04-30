@@ -45,6 +45,7 @@ public partial class MainWindow : Window
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
             await _commandSender.SendCommandAsync(student.Ip, "LOCK");
+            student.IsLocked = true; // Update the UI flag
         }
         else
         {
@@ -57,6 +58,7 @@ public partial class MainWindow : Window
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
             await _commandSender.SendCommandAsync(student.Ip, "UNLOCK");
+            student.IsLocked = false; // Update the UI flag
         }
         else
         {

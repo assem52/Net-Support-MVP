@@ -37,7 +37,10 @@ public class PdfReportGenerator
                 page.Size(PageSizes.A4);
                 page.Margin(2, Unit.Centimetre);
                 page.PageColor(Colors.White);
-                page.PageDirection(_isArabic ? TextDirection.RightToLeft : TextDirection.LeftToRight);
+                if (_isArabic)
+                {
+                    page.ContentFromRightToLeft();
+                }
                 page.DefaultTextStyle(x => x.FontSize(12).FontFamily(Fonts.Arial));
 
                 page.Header().Element(ComposeHeader);

@@ -1,79 +1,105 @@
-# NetSupport School Clone (MVP) - 2026 Edition
+# NetSupport MVP
 
-Welcome to the NetSupport School MVP! This classroom management system consists of three distinct applications that communicate over a Local Area Network (LAN) using TCP and UDP sockets.
+## Overview
 
-## 🏛️ The Three Applications
-1. **NetSupport Designer**: A standalone tool for teachers to create Multiple Choice Questions (MCQ) and export them safely to a `.csv` file.
-2. **NetSupport Student**: The client application. It runs silently in the background, broadcasts its presence to the network, and waits for exams or lock commands.
-3. **NetSupport Tutor**: The teacher's dashboard. It discovers students automatically, can lock their screens, assign exams, track live scores, and generate PDF reports.
+NetSupport MVP is a distributed classroom management and assessment software suite engineered using .NET 9 and Windows Presentation Foundation (WPF). The platform facilitates real-time workstation monitoring, synchronous remote execution (kiosk locking), and live-tracked examination deployment across a Local Area Network (LAN).
 
----
+The system relies on asynchronous UDP broadcasting for zero-configuration client discovery and established TCP streams for reliable payload transmission and telemetry tracking.
 
-## 🛠️ Deployment & Local Testing
+## System Architecture
 
-### Local Safe Mode (Anti-Lockout)
-If you are testing the **Tutor App** and the **Student App** on the exact same laptop, clicking "Lock" from the Tutor app would normally lock your entire screen, preventing you from ever clicking "Unlock"!
+The solution is organized into four discrete modules:
 
-**Solution:** 
-We have implemented a safety flag. Open `NetSupport.Student/UI/LockScreenWindow.xaml.cs` and look at line 13:
-```csharp
-public static bool IsLocalDebugMode = true;
-```
-As long as this is `true`, the Lock Screen will only open as a small 800x600 floating window. **Important:** Before you deploy this to actual university computers, change this to `false` so the lock screen is truly inescapable!
+### 1. NetSupport.Shared
 
-### Adding Custom App Icons (.ico)
-To give your `.exe` files professional icons before submission:
-1. Go to a free site like [CloudConvert](https://cloudconvert.com/png-to-ico) to convert your logo PNGs into `.ico` files.
-2. Place the `.ico` file into your project folder (e.g., `NetSupport.Tutor/tutor_icon.ico`).
-3. Open the `.csproj` file for that app and add this line inside the `<PropertyGroup>`:
-   ```xml
-   <ApplicationIcon>tutor_icon.ico</ApplicationIcon>
+The foundational library containing common interfaces, serialization objects, and networking protocols utilized by the ecosystem.
+
+- **Payload Models:** `PushExamPayload`, `AnswerUpdatePayload`, `ExamResultPayload`, `StudentHelloPayload`.
+- **Networking:** Extensible `UdpDiscoveryListener` and `UdpDiscoveryBroadcaster` classes.
+- **Localization:** A central `TranslationService` managing dynamic UI localization (English/Arabic RTL).
+
+### 2. NetSupport.Tutor
+
+The command-and-control server designed for instructor deployment.
+
+![Tutor Dashboard Screenshot](docs/assests/tutor_dashboard.png)
+
+![Tutor Dashboard Arabic Screenshot](docs/assests/tutor_dashboard_ar.png)
+
+![Testing Console Screenshot](docs/assests/exam_console.png)
+
+![PDF Report Screenshot](docs/assests/report_pdf.png)
+
+- **Auto-Discovery:** Actively listens on UDP port 8000 for client heartbeats.
+- **Command Transmission:** Initiates TCP connections to remote hosts to dispatch `LOCK`, `UNLOCK`, and `PUSH_EXAM` directives.
+- **Live Telemetry:** Processes asynchronous `ANSWER_UPDATE` payloads from connected clients, dynamically updating the DataGrid interface via the UI Dispatcher.
+- **Reporting:** Utilizes QuestPDF to generate standard-compliant UTF-8 PDF documentation of student assessment scores.
+
+### 3. NetSupport.Student
+
+The client daemon installed on target workstations.
+
+![Student Exam Interface Screenshot](docs/assests/student_exam.png)
+
+![Student Lock Screen Screenshot](docs/assests/screen_locked.png)
+
+- **Background Execution:** Initiates an isolated background thread broadcasting system metadata (IP, Hostname) over UDP.
+- **TCP Listener:** Binds to TCP port 9000 to await commands from the Tutor node.
+- **Kiosk Mode:** Upon receiving a `LOCK` or `START_EXAM` command, instantiates a TopMost, Maximized WPF overlay intercepting OS-level interrupt signals (e.g., `Alt+F4`) to enforce a restricted environment.
+
+### 4. NetSupport.Designer
+
+A standalone desktop application dedicated to assessment authoring.
+
+![Designer Application Screenshot (PENDING UPLOAD)](docs/assests/designer_app.png)
+
+- **Authoring Interface:** Split-pane design allowing localized creation of multiple-choice questions (MCQ).
+- **Data Serialization:** Exports validated examination objects into standardized `.csv` files utilizing `UTF-8 with BOM` encoding to guarantee data integrity for non-Latin character sets.
+
+## Engineering Phases & Development History
+
+The project was developed through a systematic, iterative engineering lifecycle:
+
+- **Phase 1: Minimum Viable Architecture**
+  Established the initial WPF layouts for the Tutor Dashboard and Student Login. Verified inter-project references and foundational architecture.
+- **Phase 2: UDP Auto-Discovery Protocol**
+  Engineered the zero-configuration networking layer. Student nodes broadcast identity payloads; the Tutor node aggregates and renders the active topology in real-time.
+- **Phase 3: Designer Application Implementation**
+  Created the standalone assessment authoring tool ensuring strict CSV schema compliance and secure data export operations.
+- **Phase 4: TCP Payload Streaming & Examination Flow**
+  Developed the synchronous TCP connection pipeline. Allowed the Tutor to serialize and stream CSV data over the network, initiating local examinations on the remote client.
+- **Phase 5: Student Locking Mechanism & Live Telemetry**
+  Implemented OS-level overrides to enforce kiosk execution during exams. Engineered live bidirectional telemetry (`AnswerUpdatePayload`) enabling real-time instructor visibility into assessment progress.
+- **Phase 6: QuestPDF Integration**
+  Integrated the QuestPDF rendering engine to automate the generation of formalized, localized PDF reports summarizing examination results.
+- **Phase 7: Dynamic Localization (RTL Support)**
+  Architected the `TranslationService` to support dynamic, runtime layout switching (Left-to-Right to Right-to-Left) and complete dictionary mapping for Arabic locales without requiring a process restart.
+- **Phase 8: Tutor UI Modernization**
+  Executed a complete visual overhaul of the Tutor and Console interfaces. Replaced legacy WinForms aesthetics with modern WPF `ControlTemplates`, Glassmorphism constraints, and custom DataGrid styling.
+- **Phase 9: Automated Deployment Pipeline**
+  Authored batch scripting algorithms to automate the execution of `.NET CLI` directives, compiling the suite into Standalone Single-File Executables for immediate distribution.
+
+## Deployment Instructions
+
+The application is distributed via automated compilation scripts ensuring environment independence for the end user.
+
+### Prerequisites
+
+- .NET 9.0 SDK (For compilation only)
+- Windows 10/11 x64 architecture
+
+### Compilation Workflow
+
+1. Navigate to the repository root directory.
+2. Execute the included batch script:
+   ```cmd
+   Build_And_Deploy.bat
    ```
+3. The script utilizes `dotnet publish` leveraging the `--self-contained true` flag. This bundles the Common Language Runtime (CLR) directly into the executable, removing any external dependencies.
+4. The output binaries are routed to the `NetSupport_Release` directory.
 
-### Publishing (Creating Standalone `.exe` Files)
-You don't want to run the app from Visual Studio during your demo. You want real, standalone `.exe` files.
-Open a terminal in the root of the repository and run these three commands to compile each app into a standalone file for Windows 64-bit:
+### Execution Policy
 
-```powershell
-dotnet publish NetSupport.Designer/NetSupport.Designer.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
-dotnet publish NetSupport.Student/NetSupport.Student.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
-dotnet publish NetSupport.Tutor/NetSupport.Tutor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
-```
-*You will find the final `.exe` files buried in the `bin/Release/net9.0-windows/win-x64/publish/` folders of each project.*
-
----
-
-## 🚀 Execution Guide (How to run a full test)
-
-For your final university demo, follow this exact order of operations:
-
-### Step 1: Create the Exam
-1. Open **NetSupport.Designer.exe**.
-2. Type in a few questions (try an Arabic one to show off the RTL support!).
-3. Click **Export to CSV** and save it to your desktop.
-
-### Step 2: Start the Students
-1. Open **NetSupport.Student.exe**.
-2. *Note: The app runs in the background. You won't see a window appear! It is silently broadcasting its IP address to the network.*
-3. (Optional) You can run multiple instances of the Student app if you want to simulate multiple PCs on your local machine.
-
-### Step 3: Launch the Tutor Dashboard
-1. Open **NetSupport.Tutor.exe**.
-2. You will instantly see the Student PC appear in the "Discovered Students" DataGrid.
-3. Test the **Lock Selected** button. (Thanks to Debug Mode, it will just pop up a small lock window). Hit **Unlock Selected**.
-4. Click **Open Testing Console**.
-5. Browse for the CSV file you made in Step 1.
-6. Click **Push Exam**.
-
-### Step 4: Take the Exam
-1. The Student PC will suddenly pop up an Exam Login window!
-2. Enter a student name and click "I am Ready".
-3. On the Tutor app, click the green **Start Exam** button.
-4. The student takes the test. Watch the Tutor Dashboard's **Score** column update in real-time as the student clicks answers!
-
-### Step 5: Generate the Report
-1. Once the student submits the exam, click **Generate Report** on the Tutor app.
-2. A beautiful PDF will be generated in the `Reports/` folder detailing the student's exact answers.
-
----
-*Developed by the NetSupport MVP Team - 2026*
+- **Authoring:** Execute `NetSupport.Designer.exe` to generate an assessment `.csv` dataset.
+- **Client Deployment:** Execute `NetSupport.Student.exe` on target workstations. The process runs without an initial GUI.
+- **Server Deployment:** Execute `NetSupport.Tutor.exe` on the instructor workstation. Discovered nodes will populate the dashboard, allowing command transmission and remote control operations.

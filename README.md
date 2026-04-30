@@ -22,13 +22,17 @@ The foundational library containing common interfaces, serialization objects, an
 
 The command-and-control server designed for instructor deployment.
 
-![Tutor Dashboard Screenshot](docs/assests/tutor_dashboard.png)
+## Screenshots
 
-![Tutor Dashboard Arabic Screenshot](docs/assests/tutor_dashboard_ar.png)
+![student waiting for instructor](lib/assests/waiting_for_instructor.png)
 
-![Testing Console Screenshot](docs/assests/exam_console.png)
+![Tutor Dashboard Screenshot](lib/assests/tutor_dashboard.png)
 
-![PDF Report Screenshot](docs/assests/report_pdf.png)
+![Tutor Dashboard Arabic Screenshot](lib/assests/tutor_dashboard_ar.png)
+
+![Testing Console Screenshot](lib/assests/exam_console.png)
+
+![PDF Report Screenshot](lib/assests/report_pdf.png)
 
 - **Auto-Discovery:** Actively listens on UDP port 8000 for client heartbeats.
 - **Command Transmission:** Initiates TCP connections to remote hosts to dispatch `LOCK`, `UNLOCK`, and `PUSH_EXAM` directives.
@@ -39,9 +43,9 @@ The command-and-control server designed for instructor deployment.
 
 The client daemon installed on target workstations.
 
-![Student Exam Interface Screenshot](docs/assests/student_exam.png)
+![Student Exam Interface Screenshot](lib/assests/student_exam.png)
 
-![Student Lock Screen Screenshot](docs/assests/screen_locked.png)
+![Student Lock Screen Screenshot](lib/assests/screen_locked.png)
 
 - **Background Execution:** Initiates an isolated background thread broadcasting system metadata (IP, Hostname) over UDP.
 - **TCP Listener:** Binds to TCP port 9000 to await commands from the Tutor node.
@@ -51,33 +55,10 @@ The client daemon installed on target workstations.
 
 A standalone desktop application dedicated to assessment authoring.
 
-![Designer Application Screenshot (PENDING UPLOAD)](docs/assests/designer_app.png)
+![Designer Application Screenshot](lib/assests/designer_app.png)
 
 - **Authoring Interface:** Split-pane design allowing localized creation of multiple-choice questions (MCQ).
 - **Data Serialization:** Exports validated examination objects into standardized `.csv` files utilizing `UTF-8 with BOM` encoding to guarantee data integrity for non-Latin character sets.
-
-## Engineering Phases & Development History
-
-The project was developed through a systematic, iterative engineering lifecycle:
-
-- **Phase 1: Minimum Viable Architecture**
-  Established the initial WPF layouts for the Tutor Dashboard and Student Login. Verified inter-project references and foundational architecture.
-- **Phase 2: UDP Auto-Discovery Protocol**
-  Engineered the zero-configuration networking layer. Student nodes broadcast identity payloads; the Tutor node aggregates and renders the active topology in real-time.
-- **Phase 3: Designer Application Implementation**
-  Created the standalone assessment authoring tool ensuring strict CSV schema compliance and secure data export operations.
-- **Phase 4: TCP Payload Streaming & Examination Flow**
-  Developed the synchronous TCP connection pipeline. Allowed the Tutor to serialize and stream CSV data over the network, initiating local examinations on the remote client.
-- **Phase 5: Student Locking Mechanism & Live Telemetry**
-  Implemented OS-level overrides to enforce kiosk execution during exams. Engineered live bidirectional telemetry (`AnswerUpdatePayload`) enabling real-time instructor visibility into assessment progress.
-- **Phase 6: QuestPDF Integration**
-  Integrated the QuestPDF rendering engine to automate the generation of formalized, localized PDF reports summarizing examination results.
-- **Phase 7: Dynamic Localization (RTL Support)**
-  Architected the `TranslationService` to support dynamic, runtime layout switching (Left-to-Right to Right-to-Left) and complete dictionary mapping for Arabic locales without requiring a process restart.
-- **Phase 8: Tutor UI Modernization**
-  Executed a complete visual overhaul of the Tutor and Console interfaces. Replaced legacy WinForms aesthetics with modern WPF `ControlTemplates`, Glassmorphism constraints, and custom DataGrid styling.
-- **Phase 9: Automated Deployment Pipeline**
-  Authored batch scripting algorithms to automate the execution of `.NET CLI` directives, compiling the suite into Standalone Single-File Executables for immediate distribution.
 
 ## Deployment Instructions
 

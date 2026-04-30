@@ -12,8 +12,11 @@ namespace NetSupport.Tutor.Services;
 /// </summary>
 public class PdfReportGenerator
 {
-    public string GenerateReport(IEnumerable<StudentHelloPayload> students)
+    private bool _isArabic;
+
+    public string GenerateReport(IEnumerable<StudentHelloPayload> students, bool isArabic = false)
     {
+        _isArabic = isArabic;
         // Must configure QuestPDF license type (Community is free for MVP/Open Source)
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -34,15 +37,19 @@ public class PdfReportGenerator
                 page.Size(PageSizes.A4);
                 page.Margin(2, Unit.Centimetre);
                 page.PageColor(Colors.White);
+                if (_isArabic)
+                {
+                    page.ContentFromRightToLeft();
+                }
                 page.DefaultTextStyle(x => x.FontSize(12).FontFamily(Fonts.Arial));
 
                 page.Header().Element(ComposeHeader);
                 page.Content().Element(x => ComposeContent(x, students));
                 page.Footer().AlignCenter().Text(x =>
                 {
-                    x.Span("Page ");
+                    x.Span(_isArabic ? "صفحة " : "Page ");
                     x.CurrentPageNumber();
-                    x.Span(" of ");
+                    x.Span(_isArabic ? " من " : " of ");
                     x.TotalPages();
                 });
             });
@@ -59,8 +66,8 @@ public class PdfReportGenerator
             row.RelativeItem().Column(column =>
             {
                 column.Item().Text("NetSupport School MVP").FontSize(20).SemiBold().FontColor(Colors.Blue.Darken2);
-                column.Item().Text($"Final Exam Report").FontSize(14).SemiBold();
-                column.Item().Text($"Generated on: {DateTime.Now:f}");
+                column.Item().Text(NetSupport.Shared.Services.TranslationService.Translate("Final Exam Report", _isArabic)).FontSize(14).SemiBold();
+                column.Item().Text($"{NetSupport.Shared.Services.TranslationService.Translate("Generated on:", _isArabic)} {DateTime.Now:f}");
             });
         });
     }
@@ -72,8 +79,8 @@ public class PdfReportGenerator
             foreach (var student in students)
             {
                 // Student Header
-                column.Item().PaddingTop(20).Text($"Student: {student.Name} ({student.Ip})").FontSize(16).SemiBold();
-                column.Item().Text($"Final Score: {student.Score}").FontSize(14).FontColor(Colors.Grey.Darken2);
+                column.Item().PaddingTop(20).Text($"{NetSupport.Shared.Services.TranslationService.Translate("Student:", _isArabic)} {student.Name} ({student.Ip})").FontSize(16).SemiBold();
+                column.Item().Text($"{NetSupport.Shared.Services.TranslationService.Translate("Final Score:", _isArabic)} {student.Score}").FontSize(14).FontColor(Colors.Grey.Darken2);
                 column.Item().PaddingBottom(10);
 
                 // Detailed Answers Table
@@ -91,10 +98,10 @@ public class PdfReportGenerator
                     table.Header(header =>
                     {
                         header.Cell().Element(CellStyle).Text("#");
-                        header.Cell().Element(CellStyle).Text("Question");
-                        header.Cell().Element(CellStyle).Text("Answer Given");
-                        header.Cell().Element(CellStyle).Text("Correct Answer");
-                        header.Cell().Element(CellStyle).Text("Status");
+                        header.Cell().Element(CellStyle).Text(NetSupport.Shared.Services.TranslationService.Translate("Question", _isArabic));
+                        header.Cell().Element(CellStyle).Text(NetSupport.Shared.Services.TranslationService.Translate("Answer Given", _isArabic));
+                        header.Cell().Element(CellStyle).Text(NetSupport.Shared.Services.TranslationService.Translate("Correct Answer", _isArabic));
+                        header.Cell().Element(CellStyle).Text(NetSupport.Shared.Services.TranslationService.Translate("Status", _isArabic));
                         
                         static IContainer CellStyle(IContainer c) => c.DefaultTextStyle(x => x.SemiBold()).BorderBottom(1).BorderColor(Colors.Black).PaddingBottom(5);
                     });
@@ -109,7 +116,7 @@ public class PdfReportGenerator
                             table.Cell().Element(CellStyle).Text(ans.CorrectOption);
                             
                             var statusColor = ans.IsCorrect ? Colors.Green.Medium : Colors.Red.Medium;
-                            var statusText = ans.IsCorrect ? "Correct" : "Incorrect";
+                            var statusText = ans.IsCorrect ? NetSupport.Shared.Services.TranslationService.Translate("Correct", _isArabic) : NetSupport.Shared.Services.TranslationService.Translate("Incorrect", _isArabic);
                             table.Cell().Element(CellStyle).Text(statusText).FontColor(statusColor).SemiBold();
 
                             static IContainer CellStyle(IContainer c) => c.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);

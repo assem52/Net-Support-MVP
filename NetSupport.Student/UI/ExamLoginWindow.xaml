@@ -8,11 +8,23 @@
         Background="White" 
         ShowInTaskbar="False">
     <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Welcome to the Exam" FontSize="36" FontWeight="Bold" Margin="0,0,0,20" HorizontalAlignment="Center"/>
-            <TextBlock Text="Please enter your full name to begin:" FontSize="18" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,10">
+            <Label x:Name="LblLanguage" Content="Language:" VerticalAlignment="Center"/>
+            <ComboBox x:Name="LanguageToggle" Width="80" SelectionChanged="LanguageToggle_SelectionChanged" VerticalContentAlignment="Center">
+                <ComboBoxItem Content="English" IsSelected="True" Tag="en"/>
+                <ComboBoxItem Content="العربية" Tag="ar"/>
+            </ComboBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="LblWelcome" Text="Welcome to the Exam!" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+            <TextBlock x:Name="LblPrompt" Text="Please enter your full name to begin:" FontSize="14" Margin="0,0,0,5"/>
             <TextBox x:Name="TxtName" Width="300" Height="40" FontSize="18" Margin="0,0,0,20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-            <Button x:Name="BtnSubmit" Content="I am Ready" Width="150" Height="40" FontSize="18" Click="BtnSubmit_Click"/>
+            <Button x:Name="BtnReady" Content="I am Ready" Width="150" Height="40" FontSize="18" Click="BtnReady_Click"/>
             
             <TextBlock x:Name="TxtWaiting" Text="Waiting for Instructor to start the exam..." FontSize="20" Foreground="Green" HorizontalAlignment="Center" Visibility="Collapsed"/>
         </StackPanel>

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Threading;
 using NetSupport.Shared.Models;
+using NetSupport.Shared.Services;
 using NetSupport.Student.Services;
 
 namespace NetSupport.Student.UI;
@@ -26,6 +27,13 @@ public partial class ExamWindow : Window
         InitializeComponent();
         _exam = exam;
         _updateSender = updateSender;
+
+        bool isArabic = TranslationService.IsArabic;
+        this.FlowDirection = isArabic ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+        
+        BtnNext.Content = TranslationService.Translate("Next Question", isArabic);
+        BtnPrev.Content = TranslationService.Translate("Previous Question", isArabic);
+        BtnSubmit.Content = TranslationService.Translate("Submit Exam", isArabic);
 
         _timeLeft = TimeSpan.FromMinutes(_exam.DurationMinutes);
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -55,7 +63,11 @@ public partial class ExamWindow : Window
     private void LoadQuestion(int index)
     {
         var q = _exam.Questions[index];
-        TxtProgress.Text = $"Question {index + 1} of {_exam.Questions.Count}";
+        bool isArabic = TranslationService.IsArabic;
+        TxtProgress.Text = isArabic 
+            ? $"السؤال {index + 1} من {_exam.Questions.Count}" 
+            : $"Question {index + 1} of {_exam.Questions.Count}";
+            
         TxtQuestion.Text = q.QuestionText;
         RbOptionA.Content = q.OptionA;
         RbOptionB.Content = q.OptionB;

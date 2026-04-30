@@ -5,28 +5,22 @@ using System.Text.Json;
 using NetSupport.Shared;
 using NetSupport.Shared.Models;
 
-namespace NetSupport.Student.Services;
-
-public class CommandReceivedEventArgs : EventArgs
-{
-    public string TutorIp { get; set; } = string.Empty;
-    public NetworkMessage Message { get; set; } = new();
-}
+namespace NetSupport.Tutor.Services;
 
 /// <summary>
-/// Listens for direct TCP commands (like LOCK/UNLOCK/PUSH_EXAM) from the Tutor.
+/// Listens on Port 9002 for updates coming back from the Student (like "I am ready").
 /// </summary>
-public class TcpCommandListener
+public class TcpUpdateListener
 {
     private bool _isRunning = false;
     private TcpListener? _tcpListener;
 
-    public event EventHandler<CommandReceivedEventArgs>? CommandReceived;
+    public event EventHandler<StudentReadyPayload>? StudentReadyReceived;
 
     public void StartListening()
     {
         _isRunning = true;
-        _tcpListener = new TcpListener(IPAddress.Any, Constants.TcpCommandPort);
+        _tcpListener = new TcpListener(IPAddress.Any, Constants.TcpUpdatePort);
         _tcpListener.Start();
 
         Task.Run(ListenLoopAsync);
@@ -39,10 +33,6 @@ public class TcpCommandListener
             try
             {
                 using var client = await _tcpListener!.AcceptTcpClientAsync();
-                
-                // Extract the Tutor's IP address so we know who to send answers back to
-                var remoteIp = ((IPEndPoint)client.Client.RemoteEndPoint!).Address.ToString();
-                
                 using var stream = client.GetStream();
                 using var reader = new StreamReader(stream);
                 
@@ -51,20 +41,20 @@ public class TcpCommandListener
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     var message = JsonSerializer.Deserialize<NetworkMessage>(json);
-                    if (message != null)
+                    if (message != null && message.Type == "STUDENT_READY")
                     {
-                        CommandReceived?.Invoke(this, new CommandReceivedEventArgs 
-                        { 
-                            TutorIp = remoteIp, 
-                            Message = message 
-                        });
+                        var payload = JsonSerializer.Deserialize<StudentReadyPayload>(message.Payload.GetRawText());
+                        if (payload != null)
+                        {
+                            StudentReadyReceived?.Invoke(this, payload);
+                        }
                     }
                 }
             }
-            catch (ObjectDisposedException) { }
+            catch (ObjectDisposedException) { /* Normal during shutdown */ }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TCP Listener error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Update Listener error: {ex.Message}");
             }
         }
     }

@@ -56,6 +56,20 @@ public static class TranslationService
             "Correct" => "صحيح",
             "Incorrect" => "خاطئ",
             
+            // Designer App
+            "NetSupport MVP - MCQ Designer" => "مصمم الاختبارات (NetSupport MVP)",
+            "Add New Question" => "إضافة سؤال جديد",
+            "Question Text:" => "نص السؤال:",
+            "Options:" => "الخيارات:",
+            "Correct Answer:" => "الإجابة الصحيحة:",
+            "Add to Exam" => "إضافة للاختبار",
+            "Export to CSV" => "تصدير إلى CSV",
+            "Delete Selected" => "حذف المحدد",
+            "Please fill in all fields before adding a question." => "يرجى ملء جميع الحقول قبل إضافة سؤال.",
+            "Export Successful" => "تم التصدير بنجاح",
+            "Please add at least one question before exporting." => "يرجى إضافة سؤال واحد على الأقل قبل التصدير.",
+            "Questions in Exam:" => "الأسئلة في الاختبار:",
+            
             _ => key // Fallback to English
         };
     }

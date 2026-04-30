@@ -53,6 +53,12 @@ public class StudentHelloPayload : INotifyPropertyChanged
     [JsonIgnore]
     public string Score { get => _score; set { _score = value; OnPropertyChanged(); } }
 
+    /// <summary>
+    /// Holds the final detailed analytics of the student's exam for PDF generation.
+    /// </summary>
+    [JsonIgnore]
+    public System.Collections.Generic.List<StudentAnswerInfo>? DetailedResults { get; set; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

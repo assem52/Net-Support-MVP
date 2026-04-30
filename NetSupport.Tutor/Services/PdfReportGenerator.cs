@@ -69,44 +69,57 @@ public class PdfReportGenerator
     {
         container.PaddingVertical(1, Unit.Centimetre).Column(column =>
         {
-            column.Spacing(5);
-
-            column.Item().Table(table =>
+            foreach (var student in students)
             {
-                table.ColumnsDefinition(columns =>
-                {
-                    columns.RelativeColumn(3); // Name
-                    columns.RelativeColumn(2); // IP
-                    columns.RelativeColumn(2); // Status
-                    columns.RelativeColumn(2); // Score
-                });
+                // Student Header
+                column.Item().PaddingTop(20).Text($"Student: {student.Name} ({student.Ip})").FontSize(16).SemiBold();
+                column.Item().Text($"Final Score: {student.Score}").FontSize(14).FontColor(Colors.Grey.Darken2);
+                column.Item().PaddingBottom(10);
 
-                table.Header(header =>
+                // Detailed Answers Table
+                column.Item().Table(table =>
                 {
-                    header.Cell().Element(CellStyle).Text("Student Name").SemiBold();
-                    header.Cell().Element(CellStyle).Text("IP Address").SemiBold();
-                    header.Cell().Element(CellStyle).Text("Status").SemiBold();
-                    header.Cell().Element(CellStyle).Text("Score").SemiBold();
-
-                    static IContainer CellStyle(IContainer container)
+                    table.ColumnsDefinition(columns =>
                     {
-                        return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                        columns.ConstantColumn(30); // Q#
+                        columns.RelativeColumn(4);  // Question
+                        columns.RelativeColumn(2);  // Selected
+                        columns.RelativeColumn(2);  // Correct
+                        columns.RelativeColumn(2);  // Status
+                    });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().Element(CellStyle).Text("#");
+                        header.Cell().Element(CellStyle).Text("Question");
+                        header.Cell().Element(CellStyle).Text("Answer Given");
+                        header.Cell().Element(CellStyle).Text("Correct Answer");
+                        header.Cell().Element(CellStyle).Text("Status");
+                        
+                        static IContainer CellStyle(IContainer c) => c.DefaultTextStyle(x => x.SemiBold()).BorderBottom(1).BorderColor(Colors.Black).PaddingBottom(5);
+                    });
+
+                    if (student.DetailedResults != null)
+                    {
+                        foreach (var ans in student.DetailedResults)
+                        {
+                            table.Cell().Element(CellStyle).Text(ans.QuestionIndex.ToString());
+                            table.Cell().Element(CellStyle).Text(ans.QuestionText);
+                            table.Cell().Element(CellStyle).Text(ans.SelectedOption);
+                            table.Cell().Element(CellStyle).Text(ans.CorrectOption);
+                            
+                            var statusColor = ans.IsCorrect ? Colors.Green.Medium : Colors.Red.Medium;
+                            var statusText = ans.IsCorrect ? "Correct" : "Incorrect";
+                            table.Cell().Element(CellStyle).Text(statusText).FontColor(statusColor).SemiBold();
+
+                            static IContainer CellStyle(IContainer c) => c.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                        }
                     }
                 });
 
-                foreach (var student in students)
-                {
-                    table.Cell().Element(CellStyle).Text(student.Name);
-                    table.Cell().Element(CellStyle).Text(student.Ip);
-                    table.Cell().Element(CellStyle).Text(student.IsReady ? "In Exam" : "Idle");
-                    table.Cell().Element(CellStyle).Text(string.IsNullOrWhiteSpace(student.Score) ? "N/A" : student.Score);
-
-                    static IContainer CellStyle(IContainer container)
-                    {
-                        return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                    }
-                }
-            });
+                // Separator Line
+                column.Item().PaddingVertical(20).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+            }
         });
     }
 }

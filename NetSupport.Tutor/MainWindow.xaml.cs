@@ -84,6 +84,7 @@ public partial class MainWindow : Window
             {
                 existing.Score = $"FINAL: {payload.FinalScore}";
                 existing.IsReady = false; // Exam is over
+                existing.DetailedResults = payload.DetailedAnswers; // Save detailed data for PDF
             }
         });
     }
@@ -172,16 +173,18 @@ public partial class MainWindow : Window
 
     private void GenerateReportBtn_Click(object sender, RoutedEventArgs e)
     {
-        if (_discoveredStudents.Count == 0)
+        var finishedStudents = _discoveredStudents.Where(s => s.DetailedResults != null && s.DetailedResults.Count > 0).ToList();
+
+        if (finishedStudents.Count == 0)
         {
-            MessageBox.Show("There are no students to generate a report for.", "Empty Report", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("No students have submitted an exam yet! Please wait for at least one student to finish before generating a report.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         try
         {
             var generator = new PdfReportGenerator();
-            string filePath = generator.GenerateReport(_discoveredStudents);
+            string filePath = generator.GenerateReport(finishedStudents); // Only pass finished students
 
             var result = MessageBox.Show($"Report successfully generated!\n\nSaved to:\n{filePath}\n\nDo you want to open the folder containing the report?", "Success", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (result == MessageBoxResult.Yes)

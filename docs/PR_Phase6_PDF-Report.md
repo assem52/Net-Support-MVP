@@ -8,11 +8,13 @@ This PR implements **Phase 6: PDF Report**, which gives the Tutor the ability to
 ### 1. `QuestPDF` Integration
 - I opted for **QuestPDF** over iTextSharp because it's completely free for Community/MVP projects, has an incredibly modern Fluent API, and produces incredibly beautiful tables out of the box with `Fonts.Arial` which works perfectly on Windows.
 
-### 2. `PdfReportGenerator` Service
+### 2. Detailed `PdfReportGenerator` Service & Analytics
 - Located at `NetSupport.Tutor/Services/PdfReportGenerator.cs`.
-- Takes the live `ObservableCollection` of students directly from the dashboard and parses it into a clean table structure.
+- **Enhanced Payloads**: Modified `ExamResultPayload` to carry a full breakdown of every question the student answered via the new `StudentAnswerInfo` model.
+- **Detailed Layout**: Generates a dedicated section for *each student*. Instead of a single column, it prints out an entire grid mapping out the Question Text, the Answer Given, the Correct Answer, and a color-coded Status (Green for Correct, Red for Incorrect).
 - **Auto-directory creation**: It automatically ensures a `/Reports/` folder exists alongside the executable.
 - **Timestamped Naming**: Saves files in the format `ExamReport_20260430_1030.pdf`.
+- **Validation Guards**: The Tutor is now **blocked** from clicking "Generate Report" if no students have fully submitted their exams, preventing empty/useless PDFs from being created.
 
 ### 3. Tutor Dashboard Updates
 - Added a `LightBlue` **Generate Report** button to the main toolbar.

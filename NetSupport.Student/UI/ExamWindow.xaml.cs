@@ -5,6 +5,12 @@ using NetSupport.Student.Services;
 
 namespace NetSupport.Student.UI;
 
+/// <summary>
+/// The main window displayed to the student while taking an exam.
+/// It operates in full-screen (topmost) mode, preventing other apps from being opened.
+/// It manages the exam timer, renders questions sequentially, and continuously sends 
+/// answer updates to the Tutor.
+/// </summary>
 public partial class ExamWindow : Window
 {
     private readonly PushExamPayload _exam;
@@ -29,6 +35,9 @@ public partial class ExamWindow : Window
         LoadQuestion(_currentIndex);
     }
 
+    /// <summary>
+    /// Executes every second to decrease the timer. If time runs out, it forces submission.
+    /// </summary>
     private void Timer_Tick(object? sender, EventArgs e)
     {
         _timeLeft = _timeLeft.Subtract(TimeSpan.FromSeconds(1));
@@ -40,6 +49,9 @@ public partial class ExamWindow : Window
         }
     }
 
+    /// <summary>
+    /// Renders the question and its options for the specified index.
+    /// </summary>
     private void LoadQuestion(int index)
     {
         var q = _exam.Questions[index];
@@ -80,6 +92,10 @@ public partial class ExamWindow : Window
         }
     }
 
+    /// <summary>
+    /// Triggered when the student selects any of the 4 radio button options.
+    /// It saves their choice, recalculates their live score, and sends an ANSWER_UPDATE.
+    /// </summary>
     private async void Option_Checked(object sender, RoutedEventArgs e)
     {
         string selected = "A";
@@ -118,6 +134,10 @@ public partial class ExamWindow : Window
         }
     }
 
+    /// <summary>
+    /// Forces the exam to end. Stops the timer, calculates the final score, 
+    /// sends an EXAM_RESULT to the Tutor, and closes the exam window.
+    /// </summary>
     public async void ForceSubmit()
     {
         if (_isSubmitted) return;

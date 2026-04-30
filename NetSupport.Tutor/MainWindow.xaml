@@ -18,7 +18,9 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
             <Button x:Name="LockBtn" Content="Lock Selected" Width="100" Margin="0,0,10,0" Click="LockBtn_Click"/>
             <Button x:Name="UnlockBtn" Content="Unlock Selected" Width="100" Margin="0,0,10,0" Click="UnlockBtn_Click"/>
-            <Button x:Name="TestingConsoleBtn" Content="Open Testing Console" Width="150" Click="TestingConsoleBtn_Click"/>
+            <Button x:Name="TestingConsoleBtn" Content="Open Testing Console" Width="150" Margin="0,0,10,0" Click="TestingConsoleBtn_Click"/>
+            <Button x:Name="StartExamBtn" Content="Start Exam" Width="100" Margin="0,0,10,0" Click="StartExamBtn_Click" Background="LightGreen"/>
+            <Button x:Name="StopExamBtn" Content="Stop Exam" Width="100" Margin="0,0,10,0" Click="StopExamBtn_Click" Background="LightCoral"/>
         </StackPanel>
         
         <DataGrid x:Name="StudentsDataGrid" Grid.Row="2" AutoGenerateColumns="True" IsReadOnly="True" SelectionMode="Single" />

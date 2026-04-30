@@ -25,7 +25,7 @@ public partial class ExamLoginWindow : Window
         var payload = new StudentReadyPayload
         {
             StudentName = TxtName.Text,
-            Ip = "" // Connection inherently gives tutor the IP
+            Ip = GetLocalIpAddress() // Explicitly send the exact same IP we used for UDP discovery
         };
 
         await _updateSender.SendUpdateAsync("STUDENT_READY", payload);
@@ -35,8 +35,29 @@ public partial class ExamLoginWindow : Window
         TxtWaiting.Visibility = Visibility.Visible;
     }
 
+    private string GetLocalIpAddress()
+    {
+        var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+        return "127.0.0.1";
+    }
+
     protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
     {
+        // EMERGENCY BACKDOOR FOR TESTING: Ctrl + Shift + Q closes the app
+        if (e.Key == System.Windows.Input.Key.Q && 
+            System.Windows.Input.Keyboard.Modifiers == (System.Windows.Input.ModifierKeys.Control | System.Windows.Input.ModifierKeys.Shift))
+        {
+            Application.Current.Shutdown();
+            return;
+        }
+
         if (e.Key == System.Windows.Input.Key.System && e.SystemKey == System.Windows.Input.Key.F4)
         {
             e.Handled = true; // Block Alt-F4

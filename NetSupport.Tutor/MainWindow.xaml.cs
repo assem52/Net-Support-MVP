@@ -170,6 +170,31 @@ public partial class MainWindow : Window
         }
     }
 
+    private void GenerateReportBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (_discoveredStudents.Count == 0)
+        {
+            MessageBox.Show("There are no students to generate a report for.", "Empty Report", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            var generator = new PdfReportGenerator();
+            string filePath = generator.GenerateReport(_discoveredStudents);
+
+            var result = MessageBox.Show($"Report successfully generated!\n\nSaved to:\n{filePath}\n\nDo you want to open the folder containing the report?", "Success", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            if (result == MessageBoxResult.Yes)
+            {
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to generate report: {ex.Message}\nMake sure you added the QuestPDF NuGet package!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         _listener.Stop();

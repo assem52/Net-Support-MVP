@@ -19,14 +19,20 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // 1. Start UDP Broadcaster (shouts presence)
-        _broadcaster = new UdpBroadcaster();
-        Task.Run(() => _broadcaster.StartBroadcastingAsync(Environment.MachineName, "EvalRoom"));
+        // Generate a unique ID for this specific instance
+        // This allows the Tutor to distinguish multiple Student apps on the same machine
+        var instanceId = Guid.NewGuid().ToString();
 
-        // 2. Start TCP Command Listener (waits for LOCK commands)
+        // 1. Start TCP listener FIRST so we can read the OS-assigned dynamic port
         _commandListener = new TcpCommandListener();
         _commandListener.CommandReceived += OnCommandReceived;
         _commandListener.StartListening();
+
+        int assignedPort = _commandListener.AssignedPort;
+
+        // 2. Start UDP Broadcaster, broadcasting the instance ID and dynamic port
+        _broadcaster = new UdpBroadcaster();
+        Task.Run(() => _broadcaster.StartBroadcastingAsync(Environment.MachineName, "EvalRoom", instanceId, assignedPort));
     }
 
     private void OnCommandReceived(object? sender, CommandReceivedEventArgs e)

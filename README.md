@@ -17,6 +17,7 @@ The foundational library containing common interfaces, serialization objects, an
 - **Payload Models:** `PushExamPayload`, `AnswerUpdatePayload`, `ExamResultPayload`, `StudentHelloPayload`.
 - **Networking:** Extensible `UdpDiscoveryListener` and `UdpDiscoveryBroadcaster` classes.
 - **Localization:** A central `TranslationService` managing dynamic UI localization (English/Arabic RTL).
+- **Instance Identity:** `StudentHelloPayload` carries a unique `Guid Id` and a dynamic `TcpPort` per instance, enabling multi-instance coexistence on a single host.
 
 ### 2. NetSupport.Tutor
 
@@ -47,8 +48,8 @@ The client daemon installed on target workstations.
 
 ![Student Lock Screen Screenshot](lib/assests/screen_locked.png)
 
-- **Background Execution:** Initiates an isolated background thread broadcasting system metadata (IP, Hostname) over UDP.
-- **TCP Listener:** Binds to TCP port 9000 to await commands from the Tutor node.
+- **Background Execution:** Initiates an isolated background thread broadcasting system metadata (IP, Hostname, Instance ID, TCP Port) over UDP.
+- **Dynamic Port Binding:** The TCP listener binds to port `0`, allowing the OS to assign a free ephemeral port. This assigned port is broadcast to the Tutor, enabling multiple Student instances to run simultaneously on the same machine without conflict.
 - **Kiosk Mode:** Upon receiving a `LOCK` or `START_EXAM` command, instantiates a TopMost, Maximized WPF overlay intercepting OS-level interrupt signals (e.g., `Alt+F4`) to enforce a restricted environment.
 
 ### 4. NetSupport.Designer
@@ -82,5 +83,16 @@ The application is distributed via automated compilation scripts ensuring enviro
 ### Execution Policy
 
 - **Authoring:** Execute `NetSupport.Designer.exe` to generate an assessment `.csv` dataset.
-- **Client Deployment:** Execute `NetSupport.Student.exe` on target workstations. The process runs without an initial GUI.
+- **Client Deployment:** Execute `NetSupport.Student.exe` on target workstations. Multiple instances may be launched simultaneously; each will appear as a distinct, independently addressable entry in the Tutor dashboard.
 - **Server Deployment:** Execute `NetSupport.Tutor.exe` on the instructor workstation. Discovered nodes will populate the dashboard, allowing command transmission and remote control operations.
+
+## Local Development Testing
+
+Multiple Student instances can be run on a single machine for isolated testing without requiring additional hardware.
+
+1. Launch `NetSupport.Tutor.exe`.
+2. Open multiple instances of `NetSupport.Student.exe` from the same or different terminals.
+3. Each instance generates a unique `Guid` and binds to a random OS-assigned TCP port, broadcasting both values via UDP.
+4. Each instance appears as a separate, independently addressable row in the Tutor dashboard.
+
+This behavior is transparent to real-LAN deployments. On physical classroom networks, each machine's Student instance operates identically.

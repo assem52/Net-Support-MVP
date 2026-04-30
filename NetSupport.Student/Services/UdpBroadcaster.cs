@@ -13,7 +13,7 @@ public class UdpBroadcaster
 {
     private bool _isRunning = false;
 
-    public async Task StartBroadcastingAsync(string studentName, string roomName)
+    public async Task StartBroadcastingAsync(string studentName, string roomName, string instanceId, int tcpPort)
     {
         _isRunning = true;
         
@@ -28,9 +28,11 @@ public class UdpBroadcaster
         {
             try
             {
-                // 1. Create the payload with the student's info
+                // 1. Create the payload with the student's unique info
                 var payload = new StudentHelloPayload
                 {
+                    Id = instanceId,
+                    TcpPort = tcpPort,
                     Name = studentName,
                     Ip = GetLocalIpAddress(),
                     Room = roomName

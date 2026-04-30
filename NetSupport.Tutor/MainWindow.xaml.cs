@@ -41,7 +41,8 @@ public partial class MainWindow : Window
     {
         Application.Current.Dispatcher.Invoke(() =>
         {
-            var existing = _discoveredStudents.FirstOrDefault(s => s.Ip == student.Ip);
+            // Use the unique instance Id (not IP) to allow multiple instances on one machine
+            var existing = _discoveredStudents.FirstOrDefault(s => s.Id == student.Id);
             if (existing == null)
             {
                 _discoveredStudents.Add(student);
@@ -95,7 +96,7 @@ public partial class MainWindow : Window
     {
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
-            await _commandSender.SendCommandAsync(student.Ip, "LOCK");
+            await _commandSender.SendCommandAsync(student.Ip, "LOCK", null, student.TcpPort);
             student.IsLocked = true; // Update the UI flag
         }
         else
@@ -108,7 +109,7 @@ public partial class MainWindow : Window
     {
         if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
         {
-            await _commandSender.SendCommandAsync(student.Ip, "UNLOCK");
+            await _commandSender.SendCommandAsync(student.Ip, "UNLOCK", null, student.TcpPort);
             student.IsLocked = false; // Update the UI flag
         }
         else
@@ -141,7 +142,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            await _commandSender.SendCommandAsync(student.Ip, "START_EXAM");
+            await _commandSender.SendCommandAsync(student.Ip, "START_EXAM", null, student.TcpPort);
             student.Score = "Started...";
             MessageBox.Show($"Exam started for {student.Name}!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -163,7 +164,7 @@ public partial class MainWindow : Window
 
             if (MessageBox.Show($"Are you sure you want to stop the exam for {student.Name}? This will force them to submit.", "Confirm Stop", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                await _commandSender.SendCommandAsync(student.Ip, "STOP_EXAM");
+                await _commandSender.SendCommandAsync(student.Ip, "STOP_EXAM", null, student.TcpPort);
                 MessageBox.Show("Stop command sent.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }

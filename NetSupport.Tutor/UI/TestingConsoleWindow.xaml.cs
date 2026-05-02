@@ -65,9 +65,10 @@ public partial class TestingConsoleWindow : Window
             return;
         }
 
+        var parser = new CsvParser();
         var payload = new PushExamPayload
         {
-            Questions = _loadedExam,
+            Questions = parser.Shuffle(_loadedExam),   // unique order per student
             DurationMinutes = duration
         };
 

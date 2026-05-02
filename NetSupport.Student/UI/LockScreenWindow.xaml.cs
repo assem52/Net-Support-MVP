@@ -1,45 +1,97 @@
+using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 
-namespace NetSupport.Student.UI;
-
-/// <summary>
-/// A full-screen window that stays on top to prevent the student from doing anything.
-/// </summary>
-public partial class LockScreenWindow : Window
+namespace NetSupport.Student.UI
 {
-    // SAFETY FLAG: Set this to false before deploying to actual student PCs!
-    // When true, the lock screen will NOT maximize so you can test locally without locking yourself out.
-    public static bool IsLocalDebugMode = false;
-
-    public LockScreenWindow()
+    //comment
+    public partial class LockScreenWindow : Window
     {
-        InitializeComponent();
-        
-        if (IsLocalDebugMode)
+        public static bool IsLocalDebugMode = false;
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+
+        [DllImport("user32.dll")]
+        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private static IntPtr _hookID = IntPtr.Zero;
+        private LowLevelKeyboardProc _proc;
+
+        public LockScreenWindow()
         {
-            this.WindowState = WindowState.Normal;
-            this.Topmost = false;
-            this.Width = 800;
-            this.Height = 600;
-            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            this.Title = "Screen Locked (LOCAL DEBUG MODE)";
+            InitializeComponent();
+            _proc = HookCallback;
+
+            if (!IsLocalDebugMode)
+            {
+                this.WindowState = WindowState.Maximized;
+                this.WindowStyle = WindowStyle.None;
+                this.Topmost = true;
+                this.ShowInTaskbar = false;
+
+                _hookID = SetHook(_proc);
+            }
+            else
+            {
+                this.Title = "DEBUG MODE - Keyboard Unlocked";
+            }
         }
-    }
 
-    private void EmergencyUnlock_Click(object sender, RoutedEventArgs e)
-    {
-        // Allows the user to escape the lock screen manually
-        this.Close();
-    }
-
-    // Prevent Alt-F4 from closing the lock screen
-    protected override void OnPreviewKeyDown(KeyEventArgs e)
-    {
-        if (e.Key == Key.System && e.SystemKey == Key.F4)
+        private IntPtr SetHook(LowLevelKeyboardProc proc)
         {
-            e.Handled = true;
+            using (var curProcess = System.Diagnostics.Process.GetCurrentProcess())
+            using (var curModule = curProcess.MainModule)
+            {
+                return SetWindowsHookEx(13, proc, GetModuleHandle(curModule.ModuleName), 0);
+            }
         }
-        base.OnPreviewKeyDown(e);
+
+        private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0)
+            {
+                int vkCode = Marshal.ReadInt32(lParam);
+                Key key = KeyInterop.KeyFromVirtualKey(vkCode);
+
+                if (key == Key.LWin || key == Key.RWin ||
+                    key == Key.Tab && (Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt ||
+                    key == Key.Escape && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control ||
+                    key == Key.Escape && (Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+                {
+                    return (IntPtr)1; 
+                }
+            }
+            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            UnhookWindowsHookEx(_hookID);
+            base.OnClosing(e);
+        }
+
+        private void EmergencyUnlock_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.System && e.SystemKey == Key.F4)
+            {
+                e.Handled = true;
+            }
+            base.OnPreviewKeyDown(e);
+        }
     }
 }

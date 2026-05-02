@@ -6,6 +6,7 @@ using System.Windows.Interop;
 
 namespace NetSupport.Student.UI
 {
+    //comment
     public partial class LockScreenWindow : Window
     {
         public static bool IsLocalDebugMode = false;

@@ -228,4 +228,18 @@ public partial class ExamWindow : Window
         }
         base.OnPreviewKeyDown(e);
     }
+
+    private async void BtnHelp_Click(object sender, RoutedEventArgs e)
+    {
+        var payload = new RaiseHandPayload
+        {
+            Ip = GetLocalIpAddress(),
+            IsRaising = true,
+            Message = "Exam Help Needed"
+        };
+        await _updateSender.SendUpdateAsync("RAISE_HAND", payload);
+        
+        BtnHelp.IsEnabled = false;
+        BtnHelp.Content = "Help Requested";
+    }
 }

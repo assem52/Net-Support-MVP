@@ -6,6 +6,7 @@
         Background="#F4F7FE" FontFamily="Segoe UI">
     
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <!-- Modern Rounded Button Style -->
         <Style x:Key="ModernButton" TargetType="Button">
             <Setter Property="Background" Value="#4F46E5"/>
@@ -167,6 +168,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button x:Name="LockBtn" Content="Lock Selected" Width="130" Margin="0,0,10,0" Style="{StaticResource DangerButton}" Click="LockBtn_Click"/>
                     <Button x:Name="UnlockBtn" Content="Unlock Selected" Width="130" Margin="0,0,10,0" Style="{StaticResource SecondaryButton}" Click="UnlockBtn_Click"/>
+                    <Button x:Name="ClearHelpBtn" Content="Clear Help" Width="130" Margin="0,0,10,0" Style="{StaticResource SecondaryButton}" Click="ClearHelpBtn_Click"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="TestingConsoleBtn" Content="Open Testing Console" Width="160" Margin="0,0,10,0" Style="{StaticResource SecondaryButton}" Click="TestingConsoleBtn_Click"/>
@@ -189,7 +191,22 @@
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="LblTitle" Text="Discovered Students" FontWeight="Bold" FontSize="18" Foreground="#1E293B" Margin="0,0,0,15"/>
                 
-                <DataGrid x:Name="StudentsDataGrid" Grid.Row="1" Style="{StaticResource ModernDataGrid}" AutoGenerateColumns="True" IsReadOnly="True" SelectionMode="Single" />
+                <DataGrid x:Name="StudentsDataGrid" Grid.Row="1" Style="{StaticResource ModernDataGrid}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Help" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="✋" Foreground="Red" FontSize="20" HorizontalAlignment="Center" Visibility="{Binding IsRaisingHand, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Student Name" Binding="{Binding Name}" Width="*" />
+                        <DataGridTextColumn Header="IP Address" Binding="{Binding Ip}" Width="120" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding IsReady}" Width="80" />
+                        <DataGridTextColumn Header="Locked" Binding="{Binding IsLocked}" Width="80" />
+                        <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Border>
     </Grid>

@@ -14,6 +14,16 @@ public partial class App : Application
     private ExamLoginWindow? _loginWindow;
     private UI.ExamWindow? _examWindow;
     private Shared.Models.PushExamPayload? _currentExam;
+    private string? _lastTutorIp;
+
+    public void SendUpdate(Shared.Models.NetworkMessage message)
+    {
+        if (_lastTutorIp != null)
+        {
+            var sender = new TcpUpdateSender(_lastTutorIp);
+            Task.Run(() => sender.SendUpdateAsync(message));
+        }
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -37,6 +47,7 @@ public partial class App : Application
 
     private void OnCommandReceived(object? sender, CommandReceivedEventArgs e)
     {
+        _lastTutorIp = e.TutorIp;
         Current.Dispatcher.Invoke(() =>
         {
             switch (e.Message.Type)

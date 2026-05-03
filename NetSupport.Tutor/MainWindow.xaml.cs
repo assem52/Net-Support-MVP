@@ -32,6 +32,7 @@ public partial class MainWindow : Window
         _updateListener.StudentReadyReceived += OnStudentReadyReceived;
         _updateListener.AnswerUpdateReceived += OnAnswerUpdateReceived;
         _updateListener.ExamResultReceived += OnExamResultReceived;
+        _updateListener.RaiseHandReceived += OnRaiseHandReceived;
         _updateListener.StartListening();
 
         _commandSender = new TcpCommandSender();
@@ -90,6 +91,30 @@ public partial class MainWindow : Window
                 existing.DetailedResults = payload.DetailedAnswers; // Save detailed data for PDF
             }
         });
+    }
+
+    private void OnRaiseHandReceived(object? sender, RaiseHandPayload payload)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var existing = _discoveredStudents.FirstOrDefault(s => s.Ip == payload.Ip);
+            if (existing != null)
+            {
+                existing.IsRaisingHand = payload.IsRaising;
+            }
+        });
+    }
+
+    private void ClearHelpBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (StudentsDataGrid.SelectedItem is StudentHelloPayload student)
+        {
+            student.IsRaisingHand = false;
+        }
+        else
+        {
+            MessageBox.Show("Please select a student from the list first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private async void LockBtn_Click(object sender, RoutedEventArgs e)

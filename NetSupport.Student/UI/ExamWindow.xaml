@@ -39,6 +39,9 @@
         <!-- Footer -->
         <Grid Grid.Row="3">
             <Button x:Name="BtnPrev" Content="Previous" Width="150" Height="50" FontSize="20" HorizontalAlignment="Left" Click="BtnPrev_Click"/>
+            
+            <Button x:Name="BtnHelp" Content="✋ Help" Width="120" Height="50" FontSize="20" HorizontalAlignment="Center" Background="#FFF3E0" Click="BtnHelp_Click"/>
+
             <Button x:Name="BtnNext" Content="Next" Width="150" Height="50" FontSize="20" HorizontalAlignment="Right" Click="BtnNext_Click"/>
             <Button x:Name="BtnSubmit" Content="Submit Exam" Width="200" Height="50" FontSize="20" HorizontalAlignment="Right" Background="LightGreen" Visibility="Collapsed" Click="BtnSubmit_Click"/>
         </Grid>

@@ -17,16 +17,20 @@ public class TcpUpdateSender
 
     public async Task SendUpdateAsync(string type, object payload)
     {
+        var message = new NetworkMessage
+        {
+            Type = type,
+            Payload = JsonSerializer.SerializeToElement(payload)
+        };
+        await SendUpdateAsync(message);
+    }
+
+    public async Task SendUpdateAsync(NetworkMessage message)
+    {
         try
         {
             using var tcpClient = new TcpClient();
             await tcpClient.ConnectAsync(_tutorIp, Constants.TcpUpdatePort);
-
-            var message = new NetworkMessage
-            {
-                Type = type,
-                Payload = JsonSerializer.SerializeToElement(payload)
-            };
 
             var json = JsonSerializer.Serialize(message);
             

@@ -227,6 +227,13 @@ public partial class MainWindow : Window
         }
     }
 
+    private void AnalyticsBtn_Click(object sender, RoutedEventArgs e)
+    {
+        var analytics = new UI.AnalyticsWindow(_discoveredStudents);
+        analytics.Owner = this;
+        analytics.Show();
+    }
+
     private void LanguageToggle_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded) return;
@@ -244,6 +251,7 @@ public partial class MainWindow : Window
         TestingConsoleBtn.Content = TranslationService.Translate("Open Testing Console", isArabic);
         StartExamBtn.Content = TranslationService.Translate("Start Exam", isArabic);
         StopExamBtn.Content = TranslationService.Translate("Stop Exam", isArabic);
+        AnalyticsBtn.Content = TranslationService.Translate("Live Analytics", isArabic);
         GenerateReportBtn.Content = TranslationService.Translate("Generate Report", isArabic);
 
         // Translate DataGrid Headers

@@ -75,4 +75,27 @@ public class CsvParser
         
         return result;
     }
+ 
+    public List<ExamQuestion> Shuffle(List<ExamQuestion> questions)
+    {
+        // Copy so we never mutate the original _loadedExam list
+        var shuffled = new List<ExamQuestion>(questions);
+
+        var rng = new Random();
+        int n = shuffled.Count;
+
+        // Fisher-Yates shuffle — unbiased, O(n)
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (shuffled[k], shuffled[n]) = (shuffled[n], shuffled[k]);
+        }
+
+        // Re-index so Question.Index reflects the new display order
+        for (int i = 0; i < shuffled.Count; i++)
+            shuffled[i].Index = i + 1;
+
+        return shuffled;
+    }
 }

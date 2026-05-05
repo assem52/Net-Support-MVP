@@ -18,6 +18,7 @@ public class TcpUpdateListener
     public event EventHandler<StudentReadyPayload>? StudentReadyReceived;
     public event EventHandler<AnswerUpdatePayload>? AnswerUpdateReceived;
     public event EventHandler<ExamResultPayload>? ExamResultReceived;
+    public event EventHandler<RaiseHandPayload>? RaiseHandReceived;
 
     public void StartListening()
     {
@@ -72,6 +73,15 @@ public class TcpUpdateListener
                             {
                                 if (string.IsNullOrEmpty(payload.Ip)) payload.Ip = remoteIp;
                                 ExamResultReceived?.Invoke(this, payload);
+                            }
+                        }
+                        else if (message.Type == "RAISE_HAND")
+                        {
+                            var payload = JsonSerializer.Deserialize<RaiseHandPayload>(message.Payload.GetRawText());
+                            if (payload != null)
+                            {
+                                if (string.IsNullOrEmpty(payload.Ip)) payload.Ip = remoteIp;
+                                RaiseHandReceived?.Invoke(this, payload);
                             }
                         }
                     }

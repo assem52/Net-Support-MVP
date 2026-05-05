@@ -67,6 +67,13 @@ public class StudentHelloPayload : INotifyPropertyChanged
     [JsonIgnore]
     public string Score { get => _score; set { _score = value; OnPropertyChanged(); } }
 
+    private bool _isRaisingHand = false;
+    /// <summary>
+    /// UI Helper flag to show if the student is raising their hand for help.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsRaisingHand { get => _isRaisingHand; set { _isRaisingHand = value; OnPropertyChanged(); } }
+
     /// <summary>
     /// Holds the final detailed analytics of the student's exam for PDF generation.
     /// </summary>
